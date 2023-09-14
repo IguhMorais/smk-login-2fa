@@ -1,0 +1,29 @@
+<!-- Adicione as classes de estilo do Angular Material ao seu template -->
+<div class="mat-typography login-container">
+  <div class="mat-card login-form">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="mat-h1">Login</div>
+      <mat-form-field class="full-width form-group">
+        <input matInput type="email" placeholder="Email" formControlName="email" id="email">
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched">
+          O email é obrigatório.
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">
+          Email inválido.
+        </mat-error>
+      </mat-form-field>
+      <br>
+      <mat-form-field class="full-width form-group">
+        <input matInput type="password" placeholder="Senha" formControlName="senha" id="senha">
+        <mat-error *ngIf="loginForm.get('senha')?.hasError('required') && loginForm.get('senha')?.touched">
+          A senha é obrigatória.
+        </mat-error>
+        <mat-error *ngIf="loginForm.get('senha')?.hasError('minlength') && loginForm.get('senha')?.touched">
+          A senha deve conter pelo menos 6 caracteres.
+        </mat-error>
+      </mat-form-field>
+      <br>
+      <button class="full-width" mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">Entrar</button>
+    </form>
+  </div>
+</div>

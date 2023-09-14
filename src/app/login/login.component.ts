@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   loginForm:FormGroup;
   
-  constructor(private _formBuilder: FormBuilder,private router: Router,private _auth : AuthService){
+  constructor(private _formBuilder: FormBuilder,private router: Router,private _authServico : AuthService){
 
     this.loginForm = this._formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -21,19 +21,19 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    console.log('chamando autenticacao')
-    if (this.loginForm.valid) {
-      // autenticação do usuário aqui, por exemplo,
-      const autenticado = true;
-
-      if (autenticado) {
-      console.log('autenticado')
-
-      // redirecionamento para a tela MFA.
-      this.router.navigate(['/mfa']);
-      console.log('redirecionado')
-
+    this._authServico.postLogin(this.loginForm.get('email')?.value,this.loginForm.get('senha')?.value).subscribe({
+      next:(response) => {
+        if(response.ok){
+          console.log('autenticado');
+          this.router.navigate(['/mfa']);
+        }else{
+          console.log('não autenticao');
+        }
+      }, error:(erro) => {
+      // Lógica em caso de erro na verificação
+        console.log(erro);  
       }
-    }
+    })
+  
   }
 }

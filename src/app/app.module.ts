@@ -2,6 +2,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AuthService } from './auth.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 import { InicioComponent } from './inicio.component';
 import { LoginComponent } from './login/login.component';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,7 +29,8 @@ import { RouterModule } from '@angular/router';
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
-    MatCardModule
+    MatCardModule,
+    HttpClientModule
   ],
   providers: [AuthService],
   bootstrap: [InicioComponent], 

@@ -25,7 +25,11 @@ export class LoginComponent {
       next:(response) => {
         if(response.ok){
           console.log('autenticado');
-          this.router.navigate(['/mfa']);
+          const data = {
+            'idCliente': response.data.idCliente,
+            'is2FaAtivo': response.data.is2FaAtivo
+        }
+          this.router.navigate(['/mfa'],{ state : data});
         }else{
           console.log('não autenticao');
         }

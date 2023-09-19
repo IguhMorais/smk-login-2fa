@@ -1,7 +1,8 @@
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AuthService } from './../auth.service';
-import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'smk-mfa',
@@ -10,11 +11,13 @@ import { Component } from '@angular/core';
 })
 
 
-export class MfaComponent {
+export class MfaComponent implements OnInit{
   qrCodeImage: string = ''; 
   authForm:FormGroup;
+  idCliente: number = 0;
+  is2FaAtivo: boolean = false;
   
-  constructor(private _formBuilder: FormBuilder, private _authServico : AuthService){
+  constructor(private _formBuilder: FormBuilder, private _authServico : AuthService, private router: Router){
     console.log('estamos no mfa')
     this.authForm = this._formBuilder.group({
       codigoVerificador: ['', Validators.required],
@@ -22,27 +25,55 @@ export class MfaComponent {
     });
   }
 
-  autenticar():void{
-    this._authServico.postVerificarCodigo(this.authForm.get('codigoVerificador')?.value).subscribe({
-      next:(response) => {
-        if(response.ok){
-          this._authServico.getQRCode().subscribe({
-            next:(url) => {
-              // Chama o serviço para gerar o QRCode a partir da URL
-              this.qrCodeImage = this._authServico.getQRCodeFromURI(url);
-          },
-          error:(erro)=>{
-            console.log(erro);
-          }});
-        }else{
-          console.log('não autenticao');
+  ngOnInit(): void {
+    // Use history.state para acessar os dados passados pelo state na navegação
+    const state = window.history.state;
+
+    // Verifique se o estado possui os campos que você espera
+    if (state && 'idCliente' in state && 'is2FaAtivo' in state) {
+      this.idCliente = state.idCliente;
+      this.is2FaAtivo = state.is2FaAtivo;
+    } else {
+      // Lida com o caso em que os dados do estado não estão presentes ou estão incompletos
+      this.router.navigate(['/login']);
+      console.error('Dados do estado não encontrados ou incompletos.');
+    }
+
+    if(!this.is2FaAtivo){
+      this._authServico.getQRCodeUri(this.idCliente).subscribe({
+        next:(response) =>{
+          if(response.ok){
+            const uri = response.data.uri;
+            this.qrCodeImage = this._authServico.getQRCodeFromURI(uri)
+          }
+        },
+        error:(error)=>{
+          console.log(error)
         }
-      }, error:(erro) => {
-      // Lógica em caso de erro na verificação
-        console.log(erro);  
-      }
-    });
+      });
+    }
   }
 
+  verificarCodigo():void{
+    if(this.idCliente){
+      this._authServico.postVerificarCodigo(this.idCliente,this.authForm.get('codigoVerificador')?.value).subscribe({
+        next:(response) => {
+          if(response.ok){
+            console.log('autenticado');
+          }else{
+            console.log('não autenticao');
+          }
+        }, error:(erro) => {
+        // Lógica em caso de erro na verificação
+          console.log(erro);  
+        }
+      });
+      
+    }
+  }
+
+  abrirPlanilha(){
+    // window.open(, '_blank');
+  }
   
 }

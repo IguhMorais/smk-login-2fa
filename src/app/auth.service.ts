@@ -3,11 +3,12 @@ import * as QRCode from 'qrcode-generator';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'https://sua-api.com'; // Substituir pela URL do luizao
+  private baseUrl = 'http://34.193.150.11:5000/'; // Substituir pela URL do luizao
 
   constructor(private http: HttpClient) {}
 
@@ -17,16 +18,20 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/login`, body);
   }
 
-  // provavelmente esse metodo para verifiar o codigo
-  postVerificarCodigo(codigo: string): Observable<any> {
-    const body = { codigo };
-    return this.http.post(`${this.baseUrl}/verificar-codigo`, body);
+  // Esse metodo pra quando o 2fa esta inativo
+  getQRCodeUri(idUsuario: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/2fa/${idUsuario}`,{});
   }
 
-  // esse é o metodo para receber um QRCode por URI do luizaoS
-  getQRCode(): Observable<string> {
-    // Chama o endpoint para obter a URL da imagem QRCode
-    return this.http.get<string>(`${this.baseUrl}/qrcode-uri`);
+  // Esse metodo pra quando o 2fa esta ativo
+  postVerificarCodigo(idUsuario: number,codigoInserido:string): Observable<any> {
+    const body = { codigoInserido };
+    return this.http.post(`${this.baseUrl}/2fa/${idUsuario}`,body);
+  }
+
+  // Esse metodo pra quando não sei
+  patchVerificarCodigo(idUsuario: number): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/2fa/${idUsuario}`,{});
   }
 
   getQRCodeFromURI(uri: string): string{
